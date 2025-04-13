@@ -1,9 +1,8 @@
-
 process SpaceRanger {
-    tag "Run ${params.sample_id}"
+    tag "Run ${sample_id}"
 
     input:
-    val sample_id      from params.sample_id
+    val sample_id
     path transcriptome from file(params.transcriptome)
     path probe_set     from file(params.probe_set)
     path fastq_dir     from file(params.fastq_dir)
@@ -33,6 +32,8 @@ process SpaceRanger {
 }
 
 workflow {
-    SpaceRanger()
+    Channel.value(params.sample_id).set { sample_id_ch }
+
+    SpaceRanger(sample_id_ch)
     spaceranger_results.view { "Result: $it" }
 }
