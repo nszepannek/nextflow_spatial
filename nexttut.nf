@@ -10,7 +10,7 @@ process SpaceRanger {
 
     output:
     path "${sample_id}/outs", emit: spaceranger_results
-    
+
     cpus 8
     memory '64 GB'
 
@@ -38,6 +38,11 @@ workflow {
     Channel.value(file(params.fastq_dir)).set { fastq_dir_ch }
     Channel.value(file(params.image_file)).set { image_file_ch }
 
-    SpaceRanger(sample_id_ch)
-    spaceranger_results.view { "Result: $it" }
+    SpaceRanger(
+            sample_id_ch,
+            transcriptome_ch,
+            probe_set_ch,
+            fastq_dir_ch,
+            image_file_ch
+        )    spaceranger_results.view { "Result: $it" }
 }
