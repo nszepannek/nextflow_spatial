@@ -3,10 +3,10 @@ process SpaceRanger {
 
     input:
     val sample_id
-    path transcriptome from file(params.transcriptome)
-    path probe_set     from file(params.probe_set)
-    path fastq_dir     from file(params.fastq_dir)
-    path image_file    from file(params.image_file)
+    path transcriptome
+    path probe_set
+    path fastq_dir
+    path image_file
 
     output:
     path "${sample_id}" into spaceranger_results
@@ -33,6 +33,10 @@ process SpaceRanger {
 
 workflow {
     Channel.value(params.sample_id).set { sample_id_ch }
+    Channel.value(file(params.transcriptome)).set { transcriptome_ch }
+    Channel.value(file(params.probe_set)).set { probe_set_ch }
+    Channel.value(file(params.fastq_dir)).set { fastq_dir_ch }
+    Channel.value(file(params.image_file)).set { image_file_ch }
 
     SpaceRanger(sample_id_ch)
     spaceranger_results.view { "Result: $it" }
