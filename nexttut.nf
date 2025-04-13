@@ -1,20 +1,38 @@
+
 process SpaceRanger {
-<<<<<<< HEAD
-    ./Masterarbeit/Spaceranger/spaceranger-3.1.3/spaceranger count --id="Visium_FFPE_Mouse_Brain"           
-=======
-    spaceranger count --id="Visium_FFPE_Mouse_Brain"           
->>>>>>> refs/remotes/origin/main
-        --transcriptome=refdata-gex-mm10-2020-A           
-        --probe-set=Visium_Mouse_Transcriptome_Probe_Set_v1.0_mm10-2020-A.csv           
-        --fastqs=datasets/Visium_FFPE_Mouse_BraiAn_fastqs           
-        --image=datasets/Visium_FFPE_Mouse_Brain_image.jpg           
-        --slide=V11J26-127           
-        --area=B1           
-        --reorient-images=true           
-        --localcores=16           
-        --localmem=128
+    tag "Run ${params.sample_id}"
+
+    input:
+    val sample_id      from params.sample_id
+    path transcriptome from file(params.transcriptome)
+    path probe_set     from file(params.probe_set)
+    path fastq_dir     from file(params.fastq_dir)
+    path image_file    from file(params.image_file)
+
+    output:
+    path "${sample_id}" into spaceranger_results
+
+    cpus 8
+    memory '64 GB'
+
+    script:
+    """
+    spaceranger count \\
+        --id=${sample_id} \\
+        --transcriptome=${transcriptome} \\
+        --probe-set=${probe_set} \\
+        --fastqs=${fastq_dir} \\
+        --image=${image_file} \\
+        --slide=V11J26-127 \\
+        --area=B1 \\
+        --reorient-images=true \\
+        --localcores=${task.cpus} \\
+        --localmem=128 \\
+        --create-bam=false
+    """
 }
 
 workflow {
-    SpaceRanger
+    SpaceRanger()
+    spaceranger_results.view { "Result: $it" }
 }
