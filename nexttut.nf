@@ -9,8 +9,8 @@ process SpaceRanger {
     path image_file
 
     output:
-    path "${sample_id}" into spaceranger_results
-
+    path "${sample_id}/outs", emit: spaceranger_results
+    
     cpus 8
     memory '64 GB'
 
