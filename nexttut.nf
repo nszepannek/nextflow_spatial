@@ -16,7 +16,7 @@ process SpaceRanger {
 
     script:
     """
-    spaceranger count \\
+    ~/Masterarbeit/Spaceranger/spaceranger-3.1.3/spaceranger count \\
         --id=${sample_id} \\
         --transcriptome=${transcriptome} \\
         --probe-set=${probe_set} \\
@@ -38,7 +38,7 @@ workflow {
     Channel.value(file(params.fastq_dir)).set { fastq_dir_ch }
     Channel.value(file(params.image_file)).set { image_file_ch }
 
-    SpaceRanger(
+    SpaceRanger (
             sample_id_ch,
             transcriptome_ch,
             probe_set_ch,
