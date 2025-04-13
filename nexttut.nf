@@ -1,5 +1,9 @@
 process SpaceRanger {
+<<<<<<< HEAD
     ./Masterarbeit/Spaceranger/spaceranger-3.1.3/spaceranger count --id="Visium_FFPE_Mouse_Brain"           
+=======
+    spaceranger count --id="Visium_FFPE_Mouse_Brain"           
+>>>>>>> refs/remotes/origin/main
         --transcriptome=refdata-gex-mm10-2020-A           
         --probe-set=Visium_Mouse_Transcriptome_Probe_Set_v1.0_mm10-2020-A.csv           
         --fastqs=datasets/Visium_FFPE_Mouse_BraiAn_fastqs           
