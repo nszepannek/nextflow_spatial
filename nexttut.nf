@@ -32,6 +32,9 @@ process SpaceRanger {
 }
 
 workflow {
+
+    println "Workflow läuft auf Host: ${System.getenv('HOSTNAME')}"
+    
     Channel.value(params.sample_id).set { sample_id_ch }
     Channel.value(file(params.transcriptome)).set { transcriptome_ch }
     Channel.value(file(params.probe_set)).set { probe_set_ch }
