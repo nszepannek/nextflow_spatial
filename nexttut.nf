@@ -1,5 +1,5 @@
 process SpaceRanger {
-    tag "Run ${sample_id}"
+    tag "Run ${sample_id}" // Tagname zur Übersichtlichkeit
 
     input:
     val sample_id
@@ -9,7 +9,7 @@ process SpaceRanger {
     path image_file
 
     output:
-    path "${sample_id}/outs", emit: spaceranger_results
+    path "${sample_id}/outs", emit: spaceranger_results // Name zum weiterverwenden im workflow
 
     cpus 8
     memory '64 GB'
@@ -32,8 +32,6 @@ process SpaceRanger {
 }
 
 workflow {
-
-    println "Workflow läuft auf Host: ${System.getenv('HOSTNAME')}"
     
     Channel.value(params.sample_id).set { sample_id_ch }
     Channel.value(file(params.transcriptome)).set { transcriptome_ch }
