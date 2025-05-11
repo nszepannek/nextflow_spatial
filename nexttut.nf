@@ -45,7 +45,7 @@ process RunRSkript {
     """
     echo 'Running R script'
     mkdir -p ${sample_id}_R_results
-    Rscript my_analysis_script.R \\
+    Rscript SeuratNF.R \\
         --sample_id ${sample_id} \\
         --input_dir ${spaceranger_out_dir} \\
         --output_dir ${sample_id}_R_results
