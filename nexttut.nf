@@ -31,6 +31,27 @@ process SpaceRanger {
     """
 }
 
+process RunRSkript {
+    tag "R analysis for ${sample_id}"
+
+    input:
+    val sample_id
+    path spaceranger_out_dir
+
+    output:
+    path "${sample_id}_R_results", emit: r_results
+
+    script:
+    """
+    mkdir -p ${sample_id}_R_results
+    Rscript my_analysis_script.R \\
+        --sample_id ${sample_id} \\
+        --input_dir ${spaceranger_out_dir} \\
+        --output_dir ${sample_id}_R_results
+    """
+}
+
+
 workflow {
     
     Channel.value(params.sample_id).set { sample_id_ch }
