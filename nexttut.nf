@@ -43,6 +43,7 @@ process RunRSkript {
 
     script:
     """
+    echo 'Running R script'
     mkdir -p ${sample_id}_R_results
     Rscript my_analysis_script.R \\
         --sample_id ${sample_id} \\
@@ -53,18 +54,25 @@ process RunRSkript {
 
 
 workflow {
-    
     Channel.value(params.sample_id).set { sample_id_ch }
     Channel.value(file(params.transcriptome)).set { transcriptome_ch }
     Channel.value(file(params.probe_set)).set { probe_set_ch }
     Channel.value(file(params.fastq_dir)).set { fastq_dir_ch }
     Channel.value(file(params.image_file)).set { image_file_ch }
 
-    SpaceRanger (
-            sample_id_ch,
-            transcriptome_ch,
-            probe_set_ch,
-            fastq_dir_ch,
-            image_file_ch
-        )    spaceranger_results.view { "Result: $it" }
+    // Schritt 1: SpaceRanger
+    spaceranger_results = SpaceRanger(
+        sample_id_ch,
+        transcriptome_ch,
+        probe_set_ch,
+        fastq_dir_ch,
+        image_file_ch
+    )
+
+    // Schritt 2: R Analyse
+    RunRSkript(
+        sample_id_ch,
+        spaceranger_results
+    )
 }
+
