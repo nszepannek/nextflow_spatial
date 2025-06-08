@@ -11,8 +11,9 @@ process SpaceRanger {
     output:
     path "${sample_id}/outs", emit: spaceranger_results // Name zum weiterverwenden im workflow
 
-    cpus 8
-    memory '64 GB'
+
+ 
+
 
     script:
     """
@@ -31,26 +32,26 @@ process SpaceRanger {
     """
 }
 
-process RunRSkript {
-    tag "R analysis for ${sample_id}"
 
-    input:
-    val sample_id
-    path spaceranger_out_dir
 
-    output:
-    path "${sample_id}_R_results", emit: r_results
 
-    script:
-    """
-    echo 'Running R script'
-    mkdir -p ${sample_id}_R_results
-    Rscript SeuratNF.R \\
-        --sample_id ${sample_id} \\
-        --input_dir ${spaceranger_out_dir} \\
-        --output_dir ${sample_id}_R_results
-    """
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 workflow {
@@ -69,10 +70,10 @@ workflow {
         image_file_ch
     )
 
-    // Schritt 2: R Analyse
-    RunRSkript(
-        sample_id_ch,
-        spaceranger_results
-    )
+
+
+
+
+
 }
 
