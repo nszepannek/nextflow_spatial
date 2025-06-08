@@ -33,25 +33,23 @@ process SpaceRanger {
 }
 
 
+process ProcessSeurat {
+    tag "Seurat Processing ${sample_id}"
 
+    input:
+    val sample_id
+    path spaceranger_results
 
+    output:
+    path "seurat_obj_with_umap.rds"
+    path "umap_coordinates.csv"
+    path "plots"
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    script:
+    """
+    Rscript Clustering_UMAP.R ${spaceranger_results}
+    """
+}
 
 
 workflow {
@@ -61,13 +59,18 @@ workflow {
     Channel.value(file(params.fastq_dir)).set { fastq_dir_ch }
     Channel.value(file(params.image_file)).set { image_file_ch }
 
-    // Schritt 1: SpaceRanger
+
     spaceranger_results = SpaceRanger(
         sample_id_ch,
         transcriptome_ch,
         probe_set_ch,
         fastq_dir_ch,
         image_file_ch
+    )
+    
+    ProcessSeurat(
+        sample_id_ch,
+        spaceranger_results
     )
 
 
