@@ -42,9 +42,9 @@ process Clustering_analysis {
     path r_script
 
     output:
-    path "seurat_obj_with_umap.rds"
-    path "umap_coordinates.csv"
-    path "results/plots", optional: true
+    path "seurat_obj_with_umap.rds", emit: seurat_rds
+    path "umap_coordinates.csv", emit: umap_csv
+    path "plots", emit: seurat_plots
 
     script:
     """
