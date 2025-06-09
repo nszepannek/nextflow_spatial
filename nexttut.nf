@@ -52,7 +52,7 @@ workflow {
     Channel.value(file(params.probe_set)).set { probe_set_ch }
     Channel.value(file(params.fastq_dir)).set { fastq_dir_ch }
     Channel.value(file(params.image_file)).set { image_file_ch }
-    Channel.value(file("params.rscript_cluster")).set { seurat_script_ch }
+    Channel.value(file("scripts/Clustering_UMAP.R")).set { seurat_script_ch }
 
 
     spaceranger_results = SpaceRanger(
