@@ -33,21 +33,43 @@ process SpaceRanger {
 }
 
 
-process ProcessSeurat {
-    tag "Process ${sample_id}"
+process Clustering_analysis {
+    tag "Clustering from ${sample_id}"
 
     input:
     val sample_id
-    path seurat_dir
+    path spaceranger_results
     path r_script
 
     output:
     path "seurat_obj_with_umap.rds"
     path "umap_coordinates.csv"
+    path "results/plots", optional: true
 
     script:
     """
-    Rscript ${r_script} ${seurat_dir}
+    mkdir -p results/plots
+    mkdir -p results/csv
+    Rscript ${params.rscript_cluster} ${spaceranger_results}
+    """
+}
+
+process PlotSeurat {
+    tag "Plotting ${sample_id}"
+
+    input:
+    val sample_id
+    path "seurat_obj_with_umap.rds"
+
+    output:
+    path "results/plots"
+    path "results/csv", optional: true
+
+    script:
+    """
+    mkdir -p results/plots
+    mkdir -p results/csv
+    Rscript ${params.rscript_plot} seurat_obj_with_umap.rds
     """
 }
 
@@ -59,6 +81,7 @@ workflow {
     Channel.value(file(params.fastq_dir)).set { fastq_dir_ch }
     Channel.value(file(params.image_file)).set { image_file_ch }
     Channel.value(file("Clustering_UMAP.R")).set { seurat_script_ch }
+    Channel.value(file("Plots_Clusters.R")).set { seurat_script2_ch }
 
 
     spaceranger_results = SpaceRanger(
@@ -69,16 +92,17 @@ workflow {
         image_file_ch
     )
     
-    ProcessSeurat(
+    Clustering_analysis(
         sample_id_ch,
         spaceranger_results,
         seurat_script_ch
     )
-
-
-
-
-
+    
+    PlotSeurat(
+        sample_id_ch,
+        seurat_obj_with_umap.rds,
+        seurat_script2_ch
+    )
 
 }
 
