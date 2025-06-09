@@ -4,8 +4,10 @@ library(ggplot2)
 library(patchwork)
 library(dplyr)
 
-if (!dir.exists("plots")) dir.create("plots")
-if (!dir.exists("csv")) dir.create("csv")
+args <- commandArgs(trailingOnly = TRUE)
+seurat_path <- args[1]
+
+seurat_obj <- readRDS(seurat_path)
 
 
 # Read in seurat-object with UMAP
