@@ -81,15 +81,16 @@ workflow {
         image_file_ch
     )
     
-    Clustering_analysis(
-        sample_id_ch,
-        spaceranger_results,
-        seurat_script_ch
+    clustering_results = Clustering_analysis(
+    sample_id_ch,
+    spaceranger_results,
+    seurat_script_ch
     )
+
     
     Plotting_Clusters(
         sample_id_ch,
-        seurat_umap,
+        clustering_results.seurat_umap,
         seurat_script2_ch
     )
 
