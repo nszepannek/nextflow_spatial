@@ -36,17 +36,17 @@ ref_h5ad <- readRDS("ref_h5ad.rds")
 # ref_h5ad <- readH5AD("f87d516e-83fa-4ca4-a37a-ed1ab7ff2199.h5ad")
 
 # Adapt Ensemble ID and Gene ID
-symbols <- mapIds(
-  org.Mm.eg.db,
-  keys = rownames(ref_h5ad),
-  column = "SYMBOL",
-  keytype = "ENSEMBL",
-  multiVals = "first"
-)
+#symbols <- mapIds(
+ # org.Mm.eg.db,
+  #keys = rownames(ref_h5ad),
+  #column = "SYMBOL",
+  #keytype = "ENSEMBL",
+  #multiVals = "first"
+#)
 
 # Umbenennen
-rownames(ref_h5ad) <- symbols
-saveRDS(ref_h5ad, file = "ref_h5ad.rds")
+#rownames(ref_h5ad) <- symbols
+#saveRDS(ref_h5ad, file = "ref_h5ad.rds")
 
 logcounts(ref_h5ad) <- assay(ref_h5ad, "X")
 
