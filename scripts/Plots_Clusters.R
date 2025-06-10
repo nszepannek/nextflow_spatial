@@ -98,10 +98,14 @@ for (gene in top.features) {
   dev.off()
 }
 
+seurat_obj <- FindVariableFeatures(seurat_obj, selection.method = "vst", nfeatures = 2000)
+
+top_50genes <- head(VariableFeatures(seurat_obj), 50)
+
 jpeg("./plots/DoHeatmap.jpeg", width = 1500, height = 1000, res = 200)
-DoHeatmap(seurat_obj, features = VariableFeatures(seurat_obj)[1:50], cells = 1:500, size = 4,
-          angle = 90) + NoLegend()
-print(DoHeatmap)
+print(
+  DoHeatmap(seurat_obj, features = top_50genes, size = 4, angle = 90) + NoLegend()
+)
 dev.off()
 
 # Aktiviere Cluster als Identität
