@@ -13,7 +13,7 @@ process SpaceRanger {
 
     script:
     """
-    ~/Masterarbeit/Spaceranger/spaceranger-3.1.3/spaceranger count \\
+    ${params.spaceranger_path} count \\
         --id=${sample_id} \\
         --transcriptome=${transcriptome} \\
         --probe-set=${probe_set} \\

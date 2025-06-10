@@ -21,6 +21,8 @@ seurat_obj <- Load10X_Spatial(data.dir = data_dir)
 
 # Create directory for result plots
 dir.create("plots_qc", showWarnings = FALSE)
+dir.create("csv", showWarnings = FALSE)
+
 
 ### Data Preprocessing on spot by gene expression data
 # Normalization: variance in sequencing depth (differences in cell density across the tissue)
@@ -52,4 +54,4 @@ seurat_obj <- RunUMAP(seurat_obj, reduction = "pca", dims = 1:30)
 saveRDS(seurat_obj, file = "./seurat_obj_with_umap.rds")
 
 umap_coords <- Embeddings(seurat_obj, reduction = "umap")
-write.csv(umap_coords, file = "./umap_coordinates.csv", quote = FALSE)
+write.csv(umap_coords, file = "./csv/umap_coordinates.csv", quote = FALSE)
