@@ -9,6 +9,9 @@ seurat_path <- args[1]
 
 seurat_obj <- readRDS(seurat_path)
 
+dir.create("plots", showWarnings = FALSE)
+
+
 
 # Read in seurat-object with UMAP
 seurat_obj <- readRDS("seurat_obj_with_umap.rds")
