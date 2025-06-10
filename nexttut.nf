@@ -127,7 +127,7 @@ workflow {
         clustering_results.seurat_umap,
         annot_ref_ch,
         annot_script_ch
-)
+    )
 
 }
 
