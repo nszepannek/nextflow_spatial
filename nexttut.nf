@@ -64,6 +64,28 @@ process Plotting_Clusters {
     """
 }
 
+process Annotate_Data {
+    tag "Annotation for ${sample_id}"
+
+    input:
+    val sample_id
+    path seurat_file          // seurat_obj_with_umap.rds
+    path reference_file       // .rds oder .h5ad
+    path r_script
+
+    output:
+    path "csv", emit: csv_output
+    path "plots_annotation", emit: annotation_plots
+
+    when:
+    reference_file.name.endsWith('.rds') || reference_file.name.endsWith('.h5ad')
+
+    script:
+    """
+    Rscript ${r_script} ${seurat_file} ${reference_file}
+    """
+}
+
 workflow {
     Channel.value(params.sample_id).set { sample_id_ch }
     Channel.value(file(params.transcriptome)).set { transcriptome_ch }
@@ -72,6 +94,10 @@ workflow {
     Channel.value(file(params.image_file)).set { image_file_ch }
     Channel.value(file("scripts/Clustering_UMAP.R")).set { seurat_script_ch }
     Channel.value(file("scripts/Plots_Clusters.R")).set { seurat_script2_ch }
+    
+    annot_input_ch = params.annotation_ref ? Channel.value(file(params.annotation_ref)) : Channel.empty()
+    
+    annot_script_ch = Channel.value(file("scripts/Annotation_Plots.R"))
 
 
     spaceranger_results = SpaceRanger(
@@ -94,6 +120,14 @@ workflow {
         clustering_results.seurat_umap,
         seurat_script2_ch
     )
+    
+    / Optional: Annotation only when input file exists
+    Annotate_Data(
+        sample_id_ch,
+        clustering_results.seurat_umap,
+        annot_ref_ch,
+        annot_script_ch
+)
 
 }
 
