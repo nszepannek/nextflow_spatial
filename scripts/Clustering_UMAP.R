@@ -52,4 +52,4 @@ seurat_obj <- RunUMAP(seurat_obj, reduction = "pca", dims = 1:30)
 saveRDS(seurat_obj, file = "./seurat_obj_with_umap.rds")
 
 umap_coords <- Embeddings(seurat_obj, reduction = "umap")
-write.csv(umap_coords, file = "umap_coordinates.csv", quote = FALSE)
+write.csv(umap_coords, file = "./umap_coordinates.csv", quote = FALSE)
