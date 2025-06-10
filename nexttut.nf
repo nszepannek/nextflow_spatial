@@ -95,7 +95,7 @@ workflow {
     Channel.value(file("scripts/Clustering_UMAP.R")).set { seurat_script_ch }
     Channel.value(file("scripts/Plots_Clusters.R")).set { seurat_script2_ch }
     
-    annot_input_ch = params.annot_ref ? Channel.value(file(params.annot_ref)) : Channel.empty()
+    annot_ref_ch = params.annot_ref ? Channel.value(file(params.annot_ref)) : Channel.empty()
     
     annot_script_ch = Channel.value(file("scripts/Annotation_Plots.R"))
 
