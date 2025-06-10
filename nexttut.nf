@@ -120,8 +120,7 @@ workflow {
         clustering_results.seurat_umap,
         seurat_script2_ch
     )
-    
-    / Optional: Annotation only when input file exists
+   
     Annotate_Data(
         sample_id_ch,
         clustering_results.seurat_umap,
