@@ -10,6 +10,8 @@ seurat_path <- args[1]
 seurat_obj <- readRDS(seurat_path)
 
 dir.create("plots", showWarnings = FALSE)
+dir.create("csv", showWarnings = FALSE)
+
 
 
 
