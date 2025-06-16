@@ -112,7 +112,7 @@ dev.off()
 Idents(seurat_obj) <- "seurat_clusters"  # oder "celltype", falls annotiert
 
 # Alle Cluster durchgehen
-cluster_ids <- names(sort(table(Idents(seurat_obj)), decreasing = TRUE))[1:6]
+cluster_ids <- names(sort(table(Idents(seurat_obj)), decreasing = TRUE))
 for (cluster in cluster_ids) {
   # Marker berechnen
   markers <- FindMarkers(seurat_obj, ident.1 = cluster)
