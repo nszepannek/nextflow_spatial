@@ -1,23 +1,21 @@
 #!/usr/bin/env Rscript
+
+# Load packages:
 library(Seurat)
 library(ggplot2)
 library(patchwork)
 library(dplyr)
 
+# Output of first R script (seurat_obj_with_umap.rds) is the input given in nextflow
 args <- commandArgs(trailingOnly = TRUE)
 seurat_path <- args[1]
 
+# Load seurat object
 seurat_obj <- readRDS(seurat_path)
 
+# Create directories for results (plots and csv)
 dir.create("plots", showWarnings = FALSE)
 dir.create("csv", showWarnings = FALSE)
-
-
-
-
-# Read in seurat-object with UMAP
-seurat_obj <- readRDS("seurat_obj_with_umap.rds")
-
 
 # DimPlot: clustering in UMAP space
 jpeg("./plots/dim_plot_by_umap.jpeg", width = 2000, height = 1000, res = 200)
@@ -33,7 +31,7 @@ spatialdim_by_umap <- SpatialDimPlot(seurat_obj, label = TRUE, label.size = 3)+
 print(spatialdim_by_umap)
 dev.off()
 
-# Distinguish location of individual clusters (takes a few seconds)
+# Distinguish location of top 6 clusters (takes a few seconds)
 jpeg("./plots/spatial_dim_top_6_cluster.jpeg", width = 2000, height = 1000, res = 200)
 spatial_dim_top_6_cluster <- SpatialDimPlot(seurat_obj, cells.highlight = CellsByIdentities(object = seurat_obj, idents = c(0, 1, 2, 3,
                                                                                                                            4, 5)), facet.highlight = TRUE, ncol = 3) +

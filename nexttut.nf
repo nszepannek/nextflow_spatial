@@ -64,6 +64,25 @@ process Plotting_Clusters {
     """
 }
 
+process Plotting_Genes {
+  tag "$sample_id"
+
+  input:
+  val sample_id
+  path seurat_dir3
+  val gene_ids from params.gene_ids
+
+  output:
+  path "*.pdf"
+  path "not_found_genes.txt"
+
+  script:
+  """
+  Rscript ${r_script} ${seurat_dir2} '${gene_ids.join(",")}'
+  """
+}
+
+
 process Annotate_Data {
     tag "Annotation for ${sample_id}"
 
@@ -94,6 +113,7 @@ workflow {
     Channel.value(file(params.image_file)).set { image_file_ch }
     Channel.value(file("scripts/Clustering_UMAP.R")).set { seurat_script_ch }
     Channel.value(file("scripts/Plots_Clusters.R")).set { seurat_script2_ch }
+    Channel.value(file("scripts/Selected_Genes.R")).set { seurat_script3_ch }
     
     annot_ref_ch = params.annot_ref ? Channel.value(file(params.annot_ref)) : Channel.empty()
     
@@ -119,6 +139,12 @@ workflow {
         sample_id_ch,
         clustering_results.seurat_umap,
         seurat_script2_ch
+    )
+    
+    Plotting_Genes(
+        sample_id_ch,
+        clustering_results.seurat_umap,
+        seurat_script3_ch
     )
    
     Annotate_Data(
