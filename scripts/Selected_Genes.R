@@ -20,6 +20,18 @@ gene_input <- args[2]
 seurat_obj <- readRDS(seurat_path)
 
 # Gene-IDs aus Kommandozeile parsen
+
+symbols <- mapIds(
+ org.Mm.eg.db,
+ keys = rownames(seurat_obj),
+ column = "SYMBOL",
+ keytype = "ENSEMBL",
+ multiVals = "first"
+ )
+
+# Umbenennen
+rownames(seurat_obj) <- symbols
+
 gene_ids <- if (gene_input != "") unlist(strsplit(gene_input, ",")) else character(0)
 
 if (length(gene_ids) == 0) {
