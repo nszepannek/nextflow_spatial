@@ -74,7 +74,7 @@ process Plotting_Genes {
   val gene_ids
 
   output:
-  path "*.pdf"
+  path "*.pdf", optional: true
   path "not_found_genes.txt"
 
   script:
