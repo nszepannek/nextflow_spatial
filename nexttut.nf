@@ -70,7 +70,7 @@ process Plotting_Genes {
   input:
   val sample_id
   path seurat_dir3
-  val gene_ids from params.gene_ids
+  val gene_ids
 
   output:
   path "*.pdf"
