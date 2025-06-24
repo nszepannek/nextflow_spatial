@@ -78,7 +78,7 @@ process Plotting_Genes {
 
   script:
   """
-  Rscript ${r_script} ${seurat_dir2} '${gene_ids.join(",")}'
+  Rscript ${r_script} ${seurat_dir3} '${gene_ids.join(",")}'
   """
 }
 
