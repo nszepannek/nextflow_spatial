@@ -14,7 +14,7 @@ library(viridis)
 library(reticulate)
 
 args <- commandArgs(trailingOnly = TRUE)
-seurat_obj <- args[1]
+seurat_path <- args[1]
 gene_input <- args[2]
 
 seurat_obj <- readRDS(seurat_path)
