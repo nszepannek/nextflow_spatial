@@ -19,18 +19,7 @@ gene_input <- args[2]
 
 seurat_obj <- readRDS(seurat_path)
 
-# Gene-IDs aus Kommandozeile parsen
-ensembl_ids <- mapIds(
-  org.Mm.eg.db,
-  keys = rownames(seurat_obj),
-  column = "ENSEMBL",
-  keytype = "SYMBOL",
-  multiVals = "first"
-)
-
-# Umbenennen
-rownames(seurat_obj) <- ensembl_ids
-
+# Gene-IDs von Kommandozeile einlesen (gene_input sind ENSEMBL-IDs als Komma-getrennter String)
 gene_ids <- if (gene_input != "") unlist(strsplit(gene_input, ",")) else character(0)
 
 if (length(gene_ids) == 0) {
@@ -39,24 +28,39 @@ if (length(gene_ids) == 0) {
   quit(save = "no")
 }
 
-# Prüfen, welche Gene im Datensatz vorhanden sind
-available_genes <- rownames(seurat_obj)
-genes_found <- gene_ids[gene_ids %in% available_genes]
-genes_not_found <- setdiff(gene_ids, genes_found)
+# ENSEMBL-IDs → Gensymbole mappen
+gene_symbols <- mapIds(
+  org.Mm.eg.db,
+  keys = gene_ids,
+  column = "SYMBOL",
+  keytype = "ENSEMBL",
+  multiVals = "first"
+)
 
-# Nicht gefundene Gene speichern
+# Verfügbare Gene im Seurat-Objekt (Rownames = Gensymbole)
+available_genes <- rownames(seurat_obj)
+
+# Welche gemappten Symbole sind im Seurat-Objekt vorhanden?
+genes_found <- gene_symbols[!is.na(gene_symbols) & gene_symbols %in% available_genes]
+
+# Nicht gefundene Gene (also entweder Mapping fehlgeschlagen oder nicht im Seurat-Objekt)
+genes_not_found <- gene_ids[is.na(gene_symbols) | !(gene_symbols %in% available_genes)]
+
+# Speichern der nicht gefundenen Gene
 writeLines(genes_not_found, "not_found_genes.txt")
 
+# Abbruch, wenn keine gültigen Gene gefunden wurden
 if (length(genes_found) == 0) {
   message("None of the provided genes were found in the dataset.")
   quit(save = "no")
 }
 
 # Plots erzeugen
-for (gene in genes_found) {
-  p1 <- VlnPlot(seurat_obj, features = gene) + ggtitle(paste("Violin Plot:", gene))
-  p2 <- SpatialFeaturePlot(seurat_obj, features = gene) + ggtitle(paste("Spatial:", gene))
+for (gene_symbol in genes_found) {
+  p1 <- VlnPlot(seurat_obj, features = gene_symbol) + ggtitle(paste("Violin Plot:", gene_symbol))
+  p2 <- SpatialFeaturePlot(seurat_obj, features = gene_symbol) + ggtitle(paste("Spatial:", gene_symbol))
   
-  ggsave(paste0("violin_", gene, ".pdf"), p1, width = 6, height = 4)
-  ggsave(paste0("spatial_", gene, ".pdf"), p2, width = 6, height = 5)
+  ggsave(paste0("violin_", gene_symbol, ".pdf"), p1, width = 6, height = 4)
+  ggsave(paste0("spatial_", gene_symbol, ".pdf"), p2, width = 6, height = 5)
 }
+
