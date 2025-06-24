@@ -70,6 +70,7 @@ process Plotting_Genes {
   input:
   val sample_id
   path seurat_dir3
+  path r_script
   val gene_ids
 
   output:
