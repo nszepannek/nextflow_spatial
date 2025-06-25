@@ -39,7 +39,7 @@ process Clustering_analysis {
     output:
     path "seurat_obj_with_umap.rds", emit: seurat_umap
     path "umap_coords_with_clusters.csv"
-    path "${params.outdir}/plots_qc/${sample_id}", mode: 'copy'
+    path "${params.outdir}/plots_qc/${sample_id}"
 
     script:
     """
@@ -58,7 +58,7 @@ process Plotting_Clusters {
     path r_script
 
     output:
-    path "${params.outdir}/plots/${sample_id}", mode: 'copy'
+    path "${params.outdir}/plots/${sample_id}"
 
     script:
     """
@@ -81,8 +81,8 @@ process Annotate_Data {
     path r_script
 
     output:
-    path "${params.outdir}/csv/${sample_id}", mode: 'copy', emit: csv_output
-    path "${params.outdir}/plots_annotation/${sample_id}", mode: 'copy', emit: annotation_plots
+    path "${params.outdir}/csv/${sample_id}", emit: csv_output
+    path "${params.outdir}/plots_annotation/${sample_id}", emit: annotation_plots
 
     when:
     reference_file.name.endsWith('.rds') || reference_file.name.endsWith('.h5ad')
