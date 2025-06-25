@@ -13,7 +13,7 @@ process SpaceRanger {
 
     script:
     """
-    ${spaceranger_path} count \\
+    ${params.spaceranger_path} count \\
         --id=${sample_id} \\
         --transcriptome=${transcriptome} \\
         --probe-set=${probe_set} \\
