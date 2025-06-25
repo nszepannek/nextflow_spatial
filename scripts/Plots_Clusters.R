@@ -71,24 +71,24 @@ Spatial_variable_features_top6 <- SpatialFeaturePlot(seurat_obj, features = top.
 print(Spatial_variable_features_top6)
 dev.off()
 
-# Schleife über alle Gene
+# for all genes
 for (gene in top.features) {
   
-  # --- VlnPlot ---
+  # VlnPlot
   jpeg(paste0("./plots/VlnPlot_", gene, ".jpeg"), width = 1000, height = 1000, res = 200)
   p1 <- VlnPlot(seurat_obj, features = gene) +
     ggtitle(paste("VlnPlot –", gene))
   print(p1)
   dev.off()
   
-  # --- RidgePlot ---
+  # RidgePlot
   jpeg(paste0("./plots/RidgePlot_", gene, ".jpeg"), width = 1000, height = 1000, res = 200)
   p2 <- RidgePlot(seurat_obj, features = gene) +
     ggtitle(paste("RidgePlot –", gene))
   print(p2)
   dev.off()
   
-  # --- FeaturePlot ---
+  # FeaturePlot
   jpeg(paste0("./plots/FeaturePlot_", gene, ".jpeg"), width = 1000, height = 1000, res = 200)
   p3 <- FeaturePlot(seurat_obj, features = gene) +
     ggtitle(paste("FeaturePlot –", gene))
@@ -106,19 +106,19 @@ print(
 )
 dev.off()
 
-# Aktiviere Cluster als Identität
-Idents(seurat_obj) <- "seurat_clusters"  # oder "celltype", falls annotiert
+# Set cluster as ident
+Idents(seurat_obj) <- "seurat_clusters"  # or elltype", after annotation
 
-# Alle Cluster durchgehen
+# For all clusters:
 cluster_ids <- names(sort(table(Idents(seurat_obj)), decreasing = TRUE))
 for (cluster in cluster_ids) {
-  # Marker berechnen
+  # FindMakers
   markers <- FindMarkers(seurat_obj, ident.1 = cluster)
   
   # Rownames als Spalte speichern
   markers$gene <- rownames(markers)
   
-  # Top 10 Gene fürs Label
+  # Top 10 genes:
   top10 <- markers %>% arrange(p_val_adj) %>% head(10)
   
   # Volcano Plot
@@ -134,15 +134,13 @@ for (cluster in cluster_ids) {
     ) +
     theme_classic(base_size = 14)
   
-  # Plot speichern
+  # Save plots
   plot_filename <- paste0("./plots/volcano_cluster_", cluster, ".jpg")
   ggsave(plot_filename, plot = p, width = 8, height = 6, dpi = 300)
   
-  top_markers <- markers %>%
-    group_by(cluster_ids) %>%
-    slice_max(order_by = abs(avg_log2FC), n = 100)
+   # Save csv
+  top_markers <- markers %>% arrange(p_val_adj) %>% head(100)
   
-  # CSV speichern
   csv_filename <- paste0("./csv/DEG_cluster_", cluster, ".csv")
   write.csv(top_markers, file = csv_filename, row.names = FALSE)
 }
