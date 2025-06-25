@@ -81,8 +81,8 @@ process Annotate_Data {
     path r_script
 
     output:
-    path "${params.outdir}/csv/${sample_id}", emit: csv_output, mode: 'copy'
-    path "${params.outdir}/plots_annotation/${sample_id}", emit: annotation_plots, mode: 'copy'
+    path "${params.outdir}/csv/${sample_id}", mode: 'copy', emit: csv_output
+    path "${params.outdir}/plots_annotation/${sample_id}", mode: 'copy', emit: annotation_plots
 
     when:
     reference_file.name.endsWith('.rds') || reference_file.name.endsWith('.h5ad')
