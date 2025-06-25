@@ -139,7 +139,7 @@ for (cluster in cluster_ids) {
   ggsave(plot_filename, plot = p, width = 8, height = 6, dpi = 300)
   
   top_markers <- markers %>%
-    group_by(cluster) %>%
+    group_by(cluster_ids) %>%
     slice_max(order_by = abs(avg_log2FC), n = 100)
   
   # CSV speichern
