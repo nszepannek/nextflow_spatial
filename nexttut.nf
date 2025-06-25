@@ -39,11 +39,13 @@ process Clustering_analysis {
     output:
     path "seurat_obj_with_umap.rds", emit: seurat_umap
     path "umap_coords_with_clusters.csv"
-    path "plots_qc"
+    path "${params.outdir}/plots_qc/${sample_id}", mode: 'copy'
 
     script:
     """
+    mkdir -p ${params.outdir}/plots_qc/${sample_id}
     Rscript ${r_script} ${seurat_dir}
+    cp -r plots_qc/* ${params.outdir}/plots_qc/${sample_id}/
     """
 }
 
@@ -56,11 +58,13 @@ process Plotting_Clusters {
     path r_script
 
     output:
-    path "plots"
+    path "${params.outdir}/plots/${sample_id}", mode: 'copy'
 
     script:
     """
+    mkdir -p ${params.outdir}/plots/${sample_id}
     Rscript ${r_script} ${seurat_dir2}
+    cp -r plots/* ${params.outdir}/plots/${sample_id}/
     """
 }
 
@@ -77,15 +81,21 @@ process Annotate_Data {
     path r_script
 
     output:
-    path "csv", emit: csv_output
-    path "plots_annotation", emit: annotation_plots
+    path "${params.outdir}/csv/${sample_id}", emit: csv_output, mode: 'copy'
+    path "${params.outdir}/plots_annotation/${sample_id}", emit: annotation_plots, mode: 'copy'
 
     when:
     reference_file.name.endsWith('.rds') || reference_file.name.endsWith('.h5ad')
 
     script:
     """
+    mkdir -p ${params.outdir}/csv/${sample_id}
+    mkdir -p ${params.outdir}/plots_annotation/${sample_id}
+
     Rscript ${r_script} ${seurat_file} ${reference_file}
+
+    cp -r csv/* ${params.outdir}/csv/${sample_id}/
+    cp -r plots_annotation/* ${params.outdir}/plots_annotation/${sample_id}/
     """
 }
 
