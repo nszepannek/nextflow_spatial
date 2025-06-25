@@ -138,9 +138,13 @@ for (cluster in cluster_ids) {
   plot_filename <- paste0("./plots/volcano_cluster_", cluster, ".jpg")
   ggsave(plot_filename, plot = p, width = 8, height = 6, dpi = 300)
   
+  top_markers <- markers %>%
+    group_by(cluster) %>%
+    slice_max(order_by = abs(avg_log2FC), n = 100)
+  
   # CSV speichern
   csv_filename <- paste0("./csv/DEG_cluster_", cluster, ".csv")
-  write.csv(markers, file = csv_filename, row.names = FALSE)
+  write.csv(top_markers, file = csv_filename, row.names = FALSE)
 }
 
 
