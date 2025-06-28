@@ -1,0 +1,44 @@
+.Rhistory
+.Rapp.history
+.RData
+.Ruserdata
+.Rproj.user/
+*.Rproj
+.Rout
+.Rout.save
+.Rcheck/
+.Rcache/
+__pycache__/
+
+
+# RStudio files
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+
+# Common system files
+.DS_Store
+Thumbs.db
+
+# Nextflow-specific
+work/
+.nf*
+nextflow.log
+.nextflow.log*
+pipeline_info/
+!nextflow.config
+!.nf-core.yml
+.nextflow
+
+# Results folders
+results/
+output/
+data/
+
+# Optional: hide test data
+test_data/
+test_output/
+input
+
+reports/
