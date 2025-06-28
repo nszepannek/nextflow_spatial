@@ -1,7 +1,49 @@
+process Validate_Inputs {
+    tag "Validate input data ${sample_id}"
+
+    input:
+    val sample_id
+    path transcriptome
+    path probe_set
+    path fastq_dir
+    path image_file
+
+    output:
+      val 'ok'
+
+    script:
+    """
+        # Check that transcriptome is a file
+        if [ ! -d "$transcriptome" ]; then
+          echo "❌ Error: transcriptome does not point to a valid file: $transcriptome" >&2
+          exit 1
+        fi
+
+        # Check that probe_set is a file
+        if [ ! -f "$probe_set" ]; then
+          echo "❌ Error: probe_set does not point to a valid file: $probe_set" >&2
+          exit 1
+        fi
+
+        # Check that fastq_dir is a directory
+        if [ ! -d "$fastq_dir" ]; then
+          echo "❌ Error: fastq_dir does not point to a valid directory: $fastq_dir" >&2
+          exit 1
+        fi
+
+        # Check that image_file is a file
+        if [ ! -f "$image_file" ]; then
+          echo "❌ Error: image_file does not point to a valid file: $image_file" >&2
+          exit 1
+        fi
+    """
+}
+
 process SpaceRanger {
     tag "Run ${sample_id}" // Tagname zur Übersichtlichkeit
 
     input:
+    val validated
     val sample_id
     path transcriptome
     path probe_set
@@ -13,7 +55,7 @@ process SpaceRanger {
 
     script:
     """
-    ${params.spaceranger_path} count \\
+    spaceranger count \\
         --id=${sample_id} \\
         --transcriptome=${transcriptome} \\
         --probe-set=${probe_set} \\
@@ -68,9 +110,6 @@ process Plotting_Clusters {
     """
 }
 
-
-
-
 process Annotate_Data {
     tag "Annotation for ${sample_id}"
 
@@ -108,13 +147,20 @@ workflow {
     Channel.value(file("scripts/Clustering_UMAP.R")).set { seurat_script_ch }
     Channel.value(file("scripts/Plots_Clusters.R")).set { seurat_script2_ch }
     
-    
     annot_ref_ch = params.annot_ref ? Channel.value(file(params.annot_ref)) : Channel.empty()
-    
+
     annot_script_ch = Channel.value(file("scripts/Annotation_Plots.R"))
 
+    validate_input_result = Validate_Inputs(
+        sample_id_ch,
+        transcriptome_ch,
+        probe_set_ch,
+        fastq_dir_ch,
+        image_file_ch
+    )
 
     spaceranger_results = SpaceRanger(
+        validate_input_result,
         sample_id_ch,
         transcriptome_ch,
         probe_set_ch,
@@ -127,15 +173,12 @@ workflow {
     spaceranger_results,
     seurat_script_ch
     )
-
     
     Plotting_Clusters(
         sample_id_ch,
         clustering_results.seurat_umap,
         seurat_script2_ch
     )
-    
-    
    
     Annotate_Data(
         sample_id_ch,
@@ -143,6 +186,5 @@ workflow {
         annot_ref_ch,
         annot_script_ch
     )
-
 }
 

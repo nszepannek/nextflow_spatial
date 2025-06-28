@@ -13,56 +13,59 @@ library(SingleR)
 library(viridis)
 library(reticulate)
 
+args <- commandArgs(trailingOnly = TRUE)
+seurat_obj_path <- args[1]
+annot_ref <- args[2]
 
 dir.create("plots_annotation", showWarnings = FALSE)
 if (!dir.exists("csv")) dir.create("csv")
 
+annot_ref_h5ad <- sub("\\.rds$", ".h5ad", annot_ref)
+
+if (file.exists(annot_ref_h5ad)) {
+  ref_h5ad <- readH5AD(annot_ref_h5ad)
+
+  # Adapt Ensemble ID and Gene ID
+  symbols <- mapIds(
+   org.Mm.eg.db,
+   keys = rownames(ref_h5ad),
+   column = "SYMBOL",
+   keytype = "ENSEMBL",
+   multiVals = "first"
+   )
+
+  # Umbenennen
+  rownames(ref_h5ad) <- symbols
+  saveRDS(ref_h5ad, annot_ref)
+}
+
+ref_rds <- readRDS(annot_ref)
 
 # Read in seurat-object with UMAP
-seurat_obj <- readRDS("seurat_obj_with_umap.rds")
+seurat_obj <- readRDS(seurat_obj_path)
 
 seurat_obj <- SCTransform(seurat_obj, assay = "Spatial", verbose = FALSE)
-
-
 
 #### Convert seurat object to single cell experiment
 class(as.SingleCellExperiment(seurat_obj))
 seurat_obj.sce <- as.SingleCellExperiment(seurat_obj)
 seurat_obj.sce
 
-# Read in reference
-ref_h5ad <- readRDS("ref_h5ad.rds")
-
-# ref_h5ad <- readH5AD("f87d516e-83fa-4ca4-a37a-ed1ab7ff2199.h5ad")
-
-# Adapt Ensemble ID and Gene ID
-#symbols <- mapIds(
- # org.Mm.eg.db,
-  #keys = rownames(ref_h5ad),
-  #column = "SYMBOL",
-  #keytype = "ENSEMBL",
-  #multiVals = "first"
-#)
-
-# Umbenennen
-#rownames(ref_h5ad) <- symbols
-#saveRDS(ref_h5ad, file = "ref_h5ad.rds")
-
-logcounts(ref_h5ad) <- assay(ref_h5ad, "X")
+logcounts(ref_rds) <- assay(ref_rds, "X")
 
 
 # Cellannotation
 pred <- SingleR(
   test = seurat_obj.sce,
-  ref = ref_h5ad,
+  ref = ref_rds,
   assay.type.test = "counts",  # von brain.sce
-  assay.type.ref  = "X",          # von ref_h5ad
-  labels = ref_h5ad$cell_type     # Zelltyp-Spalte
+  assay.type.ref  = "X",          # von ref_rds
+  labels = ref_rds$cell_type     # Zelltyp-Spalte
 )
 
 # SingleR aufrufen
-#pred <- SingleR(test = seurat_obj.sce, ref = ref_h5ad, labels = ref$label.main)
-# pred <- SingleR(test = seurat_obj.sce, ref = ref_h5ad, labels = ref_h5ad$cell_type)
+#pred <- SingleR(test = seurat_obj.sce, ref = ref_rds, labels = ref$label.main)
+# pred <- SingleR(test = seurat_obj.sce, ref = ref_rds, labels = ref_rds$cell_type)
 # Ergebnis z.B. als DataFrame
 # Ergebnis z.B. als DataFrame
 jpeg("./plots_annotation/pred.jpeg", width = 2000, height = 1000, res = 200)
@@ -96,5 +99,3 @@ write.csv(as.data.frame(main_cells), "./csv/main_cells.csv", row.names = TRUE)
 
 predforloupe <- subset(pred, select = "labels")
 write.table(predforloupe, file="./csv/predforloupe.csv", sep=",")
-
-
