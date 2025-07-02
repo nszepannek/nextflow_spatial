@@ -38,6 +38,9 @@ if (file.exists(annot_ref_h5ad)) {
   rownames(ref_h5ad) <- symbols
   saveRDS(ref_h5ad, annot_ref)
 }
+if (!file.exists(annot_ref)) {
+  quit(status = 0)
+}
 
 ref_rds <- readRDS(annot_ref)
 

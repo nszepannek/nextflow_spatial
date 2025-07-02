@@ -123,9 +123,6 @@ process Annotate_Data {
     path "${params.outdir}/csv/${sample_id}", emit: csv_output
     path "${params.outdir}/plots_annotation/${sample_id}", emit: annotation_plots
 
-    when:
-    reference_file.name.endsWith('.rds') || reference_file.name.endsWith('.h5ad')
-
     script:
     """
     mkdir -p ${params.outdir}/csv/${sample_id}
