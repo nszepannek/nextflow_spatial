@@ -2,7 +2,7 @@
 
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
-docker run --rm -v $(pwd):/workspace nvcr.io/muwsc/ifi/nf-spatial:latest nextflow run nf_spatial.nf \
+srun --container-image=nvcr.io/muwsc/ifi/nf-spatial:latest nextflow run nf_spatial.nf \
   -with-report reports/report_${TIMESTAMP}.html \
   -with-trace reports/trace_${TIMESTAMP}.txt \
   -with-dag reports/flowchart_${TIMESTAMP}.png \
