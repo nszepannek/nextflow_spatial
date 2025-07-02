@@ -116,7 +116,7 @@ process Annotate_Data {
     input:
     val sample_id
     path seurat_file          // seurat_obj_with_umap.rds
-    path reference_file       // .rds oder .h5ad
+    val reference_file       // .rds oder .h5ad
     path r_script
 
     output:
@@ -147,7 +147,7 @@ workflow {
     Channel.value(file("scripts/Clustering_UMAP.R")).set { seurat_script_ch }
     Channel.value(file("scripts/Plots_Clusters.R")).set { seurat_script2_ch }
     
-    annot_ref_ch = params.annot_ref ? Channel.value(file(params.annot_ref)) : Channel.empty()
+    annot_ref_ch = params.annot_ref ? Channel.value(params.annot_ref) : Channel.empty()
 
     annot_script_ch = Channel.value(file("scripts/Annotation_Plots.R"))
 
