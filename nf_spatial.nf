@@ -15,25 +15,25 @@ process Validate_Inputs {
     """
         # Check that transcriptome is a file
         if [ ! -d "$transcriptome" ]; then
-          echo "❌ Error: transcriptome does not point to a valid file: $transcriptome" >&2
+          echo "Error: transcriptome does not point to a valid file: $transcriptome" >&2
           exit 1
         fi
 
         # Check that probe_set is a file
         if [ ! -f "$probe_set" ]; then
-          echo "❌ Error: probe_set does not point to a valid file: $probe_set" >&2
+          echo "Error: probe_set does not point to a valid file: $probe_set" >&2
           exit 1
         fi
 
         # Check that fastq_dir is a directory
         if [ ! -d "$fastq_dir" ]; then
-          echo "❌ Error: fastq_dir does not point to a valid directory: $fastq_dir" >&2
+          echo "Error: fastq_dir does not point to a valid directory: $fastq_dir" >&2
           exit 1
         fi
 
         # Check that image_file is a file
         if [ ! -f "$image_file" ]; then
-          echo "❌ Error: image_file does not point to a valid file: $image_file" >&2
+          echo "Error: image_file does not point to a valid file: $image_file" >&2
           exit 1
         fi
     """
@@ -176,12 +176,18 @@ workflow {
         clustering_results.seurat_umap,
         seurat_script2_ch
     )
-   
-    Annotate_Data(
-        sample_id_ch,
-        clustering_results.seurat_umap,
-        annot_ref_ch,
-        annot_script_ch
-    )
+    
+    if (params.run_annotation) {
+        Annotate_Data(
+            sample_id_ch,
+            clustering_results.seurat_umap,
+            annot_ref_ch,
+            annot_script_ch
+        )
+    }
+
+    else {
+        log.info " Annotation step skipped (params.run_annotation = false)"
+    }    
 }
 
