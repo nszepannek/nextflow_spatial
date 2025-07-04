@@ -143,10 +143,7 @@ workflow {
     Channel.value(file(params.image_file)).set { image_file_ch }
     Channel.value(file("scripts/Clustering_UMAP.R")).set { seurat_script_ch }
     Channel.value(file("scripts/Plots_Clusters.R")).set { seurat_script2_ch }
-    
-    annot_ref_ch = params.annot_ref ? Channel.value(params.annot_ref) : Channel.empty()
-
-    annot_script_ch = Channel.value(file("scripts/Annotation_Plots.R"))
+    Channel.value(file("scripts/Annotation_Plots.R")).set { annot_script_ch }
 
     validate_input_result = Validate_Inputs(
         sample_id_ch,
@@ -178,6 +175,7 @@ workflow {
     )
     
     if (params.run_annotation) {
+      annot_ref_ch = Channel.value(params.annot_ref)()
         Annotate_Data(
             sample_id_ch,
             clustering_results.seurat_umap,
