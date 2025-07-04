@@ -175,7 +175,7 @@ workflow {
     )
     
     if (params.run_annotation) {
-      annot_ref_ch = Channel.value(params.annot_ref)()
+      annot_ref_ch = Channel.value(params.annot_ref)
         Annotate_Data(
             sample_id_ch,
             clustering_results.seurat_umap,
