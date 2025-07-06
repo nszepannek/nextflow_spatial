@@ -110,6 +110,27 @@ process Plotting_Clusters {
     """
 }
 
+process Plot_Selected_Genes {
+    tag "Gene plots for ${sample_id}"
+
+    input:
+    val sample_id
+    path seurat_dir
+    val genes
+    path r_script
+
+    output:
+    path "plots_selected_genes", emit: gene_plots
+
+    script:
+    """
+    mkdir -p plots_selected_genes
+
+    Rscript ${r_script} ${seurat_file} ${genes}
+    """
+}
+
+
 process Annotate_Data {
     tag "Annotation for ${sample_id}"
 
@@ -143,6 +164,8 @@ workflow {
     Channel.value(file(params.image_file)).set { image_file_ch }
     Channel.value(file("scripts/Clustering_UMAP.R")).set { seurat_script_ch }
     Channel.value(file("scripts/Plots_Clusters.R")).set { seurat_script2_ch }
+    r_script_ch = Channel.of(file("scripts/Selected_Genes.R"))
+    genes_ch = Channel.value(params.genes.split(','))
     Channel.value(file("scripts/Annotation_Plots.R")).set { annot_script_ch }
 
     validate_input_result = Validate_Inputs(
@@ -172,6 +195,13 @@ workflow {
         sample_id_ch,
         clustering_results.seurat_umap,
         seurat_script2_ch
+    )
+
+    Plot_Selected_Genes(
+        sample_id_ch,
+        seurat_file_ch,
+        genes_ch,
+        r_script_ch
     )
     
     if (params.run_annotation) {
