@@ -9,7 +9,9 @@ library(dplyr)
 # Output of first R script (seurat_obj_with_umap.rds) is the input given in nextflow
 args <- commandArgs(trailingOnly = TRUE)
 seurat_path <- args[1]
-genes <- args[-1]
+genes <- args[2]
+
+genes <- unlist(strsplit(genes_string, split = ","))
 
 # Load seurat object
 seurat_obj <- readRDS(seurat_path)
