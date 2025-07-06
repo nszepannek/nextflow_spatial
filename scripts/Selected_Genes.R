@@ -22,7 +22,7 @@ all_genes <- rownames(seurat_obj)
 # Loop through provided genes
 for (gene in genes) {
   if (!(gene %in% all_genes)) {
-    message(paste0("⚠️ Gene not found in Seurat object: ", gene))
+    message(paste0("Gene not found in Seurat object: ", gene))
     next
   }
 

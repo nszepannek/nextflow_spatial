@@ -51,7 +51,7 @@ process SpaceRanger {
     path image_file
 
     output:
-    path "${sample_id}/outs"
+    path "${sample_id}/outs", emit: spaceranger_results // Name zum weiterverwenden im workflow
 
     script:
     """
@@ -122,12 +122,11 @@ process Plot_Selected_Genes {
     output:
     path "${params.outdir}/plots_selected_genes/${sample_id}"
 
-
     script:
     """
     mkdir -p ${params.outdir}/plots_selected_genes/${sample_id}
-    Rscript ${r_script} ${seurat_dir} ${genes}
-    cp -r plots_selected_genes/* ${params.outdir}/plots/${sample_id}/
+    Rscript ${r_script} ${seurat_file} ${genes}
+    cp -r plots_selected_genes/* ${params.outdir}/plots_selected_genes/${sample_id}/
 
     """
 }
@@ -170,7 +169,7 @@ workflow {
     genes_ch = Channel.value(params.genes.split(','))
     Channel.value(file("scripts/Annotation_Plots.R")).set { annot_script_ch }
 
-    Validate_Inputs(
+    validate_input_result = Validate_Inputs(
         sample_id_ch,
         transcriptome_ch,
         probe_set_ch,
@@ -178,7 +177,7 @@ workflow {
         image_file_ch
     )
 
-    SpaceRanger(
+    spaceranger_results = SpaceRanger(
         validate_input_result,
         sample_id_ch,
         transcriptome_ch,
@@ -187,10 +186,10 @@ workflow {
         image_file_ch
     )
     
-    Clustering_analysis(
-        sample_id_ch,
-        spaceranger_results,
-        seurat_script_ch
+    clustering_results = Clustering_analysis(
+    sample_id_ch,
+    spaceranger_results,
+    seurat_script_ch
     )
     
     Plotting_Clusters(
