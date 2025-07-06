@@ -125,7 +125,7 @@ process Plot_Selected_Genes {
     script:
     """
     mkdir -p ${params.outdir}/plots_selected_genes/${sample_id}
-    Rscript ${r_script} ${seurat_file} ${genes}
+    Rscript ${r_script} ${seurat_dir} ${genes}
     cp -r plots_selected_genes/* ${params.outdir}/plots_selected_genes/${sample_id}/
 
     """
