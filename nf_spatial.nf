@@ -51,7 +51,7 @@ process SpaceRanger {
     path image_file
 
     output:
-    path "${sample_id}/outs", emit: spaceranger_results // Name zum weiterverwenden im workflow
+    path "${sample_id}/outs"
 
     script:
     """
@@ -120,13 +120,15 @@ process Plot_Selected_Genes {
     path r_script
 
     output:
-    path "plots_selected_genes", emit: gene_plots
+    path "${params.outdir}/plots_selected_genes/${sample_id}"
+
 
     script:
     """
-    mkdir -p plots_selected_genes
+    mkdir -p ${params.outdir}/plots_selected_genes/${sample_id}
+    Rscript ${r_script} ${seurat_dir} ${genes}
+    cp -r plots_selected_genes/* ${params.outdir}/plots/${sample_id}/
 
-    Rscript ${r_script} ${seurat_file} ${genes}
     """
 }
 
@@ -164,11 +166,11 @@ workflow {
     Channel.value(file(params.image_file)).set { image_file_ch }
     Channel.value(file("scripts/Clustering_UMAP.R")).set { seurat_script_ch }
     Channel.value(file("scripts/Plots_Clusters.R")).set { seurat_script2_ch }
-    r_script_ch = Channel.of(file("scripts/Selected_Genes.R"))
+    Channel.value(file("scripts/Selected_Genes.R")).set { seurat_script3_ch }
     genes_ch = Channel.value(params.genes.split(','))
     Channel.value(file("scripts/Annotation_Plots.R")).set { annot_script_ch }
 
-    validate_input_result = Validate_Inputs(
+    Validate_Inputs(
         sample_id_ch,
         transcriptome_ch,
         probe_set_ch,
@@ -176,7 +178,7 @@ workflow {
         image_file_ch
     )
 
-    spaceranger_results = SpaceRanger(
+    SpaceRanger(
         validate_input_result,
         sample_id_ch,
         transcriptome_ch,
@@ -185,10 +187,10 @@ workflow {
         image_file_ch
     )
     
-    clustering_results = Clustering_analysis(
-    sample_id_ch,
-    spaceranger_results,
-    seurat_script_ch
+    Clustering_analysis(
+        sample_id_ch,
+        spaceranger_results,
+        seurat_script_ch
     )
     
     Plotting_Clusters(
@@ -199,9 +201,9 @@ workflow {
 
     Plot_Selected_Genes(
         sample_id_ch,
-        seurat_file_ch,
+        clustering_results.seurat_umap,
         genes_ch,
-        r_script_ch
+        seurat_script3_ch
     )
     
     if (params.run_annotation) {
