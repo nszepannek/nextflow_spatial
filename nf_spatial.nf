@@ -197,8 +197,7 @@ workflow {
     )
 
     if (params.genes && params.genes.trim()) {
-        genes_ch = Channel.value(params.genes.split(',').collect { it.trim() })
-
+        genes_ch = Channel.value(params.genes)      
         Plot_Selected_Genes(
             sample_id_ch,
             clustering_results.seurat_umap,
