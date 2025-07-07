@@ -11,6 +11,12 @@ args <- commandArgs(trailingOnly = TRUE)
 seurat_path <- args[1]
 genes <- args[2]
 
+if (length(genes) == 0) {
+  message("No genes provided.")
+} else {
+  message("Received genes.")
+}
+
 genes <- unlist(strsplit(genes, split = ","))
 
 # Load seurat object

@@ -126,8 +126,7 @@ process Plot_Selected_Genes {
     """
     mkdir -p ${params.outdir}/plots_selected_genes/${sample_id}
     Rscript ${r_script} ${seurat_dir} ${genes}
-    cp -r plots_selected_genes/* ${params.outdir}/plots_selected_genes/${sample_id}/
-
+    [ -d plots_selected_genes ] && cp -r plots_selected_genes/* ${params.outdir}/plots_selected_genes/${sample_id}/ || true
     """
 }
 
@@ -197,15 +196,20 @@ workflow {
         seurat_script2_ch
     )
 
-    if (params.selected_genes) {
-      genes_ch = Channel.value(params.genes.split(','))
+    if (params.genes && params.genes.trim()) {
+        genes_ch = Channel.value(params.genes.split(',').collect { it.trim() })
+
         Plot_Selected_Genes(
-        sample_id_ch,
-        clustering_results.seurat_umap,
-        genes_ch,
-        seurat_script3_ch
+            sample_id_ch,
+            clustering_results.seurat_umap,
+            genes_ch,
+            seurat_script3_ch
         )
-    }    
+    } else {
+        log.info "Skipping 'Plot_Selected_Genes' step – no genes given in --genes"
+    }
+}
+  
     
     if (params.run_annotation) {
       annot_ref_ch = Channel.value(params.annot_ref)
