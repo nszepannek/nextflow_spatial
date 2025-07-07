@@ -208,8 +208,6 @@ workflow {
         log.info "Skipping 'Plot_Selected_Genes' step – no genes given in --genes"
     }
 
-  
-    
     if (params.run_annotation) {
       annot_ref_ch = Channel.value(params.annot_ref)
         Annotate_Data(
@@ -221,7 +219,7 @@ workflow {
     }
 
     else {
-        log.info " Annotation step skipped (params.run_annotation = false)"
+        log.info "Annotation step skipped (params.run_annotation = false)"
     }    
 }
 

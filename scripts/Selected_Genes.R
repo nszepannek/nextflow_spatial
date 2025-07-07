@@ -27,7 +27,7 @@ dir.create("plots_selected_genes", showWarnings = FALSE)
 # Get all available features
 all_genes <- rownames(seurat_obj)
 
-# Loop through provided genes
+# Loop through selected genes
 for (gene in genes) {
   if (!(gene %in% all_genes)) {
     message(paste0("Gene not found in Seurat object: ", gene))

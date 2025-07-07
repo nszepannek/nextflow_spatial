@@ -143,10 +143,6 @@ for (cluster in cluster_ids) {
 }
 
 
-# Additional: interactive plotting, subset of anatomical regions, wokrking with mulitple slices
-# --> Bioinformatik/Masterarbeit/Seurat/Seurat.R
-
-
 
 
 
