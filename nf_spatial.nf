@@ -166,7 +166,6 @@ workflow {
     Channel.value(file("scripts/Clustering_UMAP.R")).set { seurat_script_ch }
     Channel.value(file("scripts/Plots_Clusters.R")).set { seurat_script2_ch }
     Channel.value(file("scripts/Selected_Genes.R")).set { seurat_script3_ch }
-    genes_ch = Channel.value(params.genes.split(','))
     Channel.value(file("scripts/Annotation_Plots.R")).set { annot_script_ch }
 
     validate_input_result = Validate_Inputs(
@@ -198,12 +197,15 @@ workflow {
         seurat_script2_ch
     )
 
-    Plot_Selected_Genes(
+    if (params.selected_genes) {
+      genes_ch = Channel.value(params.genes.split(','))
+        Plot_Selected_Genes(
         sample_id_ch,
         clustering_results.seurat_umap,
         genes_ch,
         seurat_script3_ch
-    )
+        )
+    }    
     
     if (params.run_annotation) {
       annot_ref_ch = Channel.value(params.annot_ref)
