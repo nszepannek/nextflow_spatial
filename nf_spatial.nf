@@ -208,7 +208,7 @@ workflow {
     } else {
         log.info "Skipping 'Plot_Selected_Genes' step – no genes given in --genes"
     }
-}
+
   
     
     if (params.run_annotation) {
