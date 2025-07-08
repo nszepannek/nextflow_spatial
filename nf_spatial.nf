@@ -42,6 +42,8 @@ process Validate_Inputs {
 process SpaceRanger {
     tag "Run ${sample_id}" // Tagname zur Übersichtlichkeit
 
+    cpus 8
+
     input:
     val validated
     val sample_id
