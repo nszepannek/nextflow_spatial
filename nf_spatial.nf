@@ -13,7 +13,7 @@ process Validate_Inputs {
 
     script:
     """
-        # Check that transcriptome is a file
+        # Check that transcriptome is a directory
         if [ ! -d "$transcriptome" ]; then
           echo "Error: transcriptome does not point to a valid file: $transcriptome" >&2
           exit 1
@@ -49,6 +49,8 @@ process SpaceRanger {
     path probe_set
     path fastq_dir
     path image_file
+    val slide_sp
+    val area_sp
 
     output:
     path "${sample_id}/outs", emit: spaceranger_results // Name zum weiterverwenden im workflow
@@ -61,8 +63,8 @@ process SpaceRanger {
         --probe-set=${probe_set} \\
         --fastqs=${fastq_dir} \\
         --image=${image_file} \\
-        --slide=V11J26-127 \\
-        --area=B1 \\
+        --slide=${slide_sp} \\
+        --area=${area_sp} \\
         --reorient-images=true \\
         --localcores=${task.cpus} \\
         --localmem=128 \\
@@ -162,6 +164,8 @@ workflow {
     Channel.value(file(params.probe_set)).set { probe_set_ch }
     Channel.value(file(params.fastq_dir)).set { fastq_dir_ch }
     Channel.value(file(params.image_file)).set { image_file_ch }
+    Channel.value(params.slide_sp).set { slide_sp_ch }
+    Channel.value(params.area_sp).set { area_sp_ch }
     Channel.value(file("scripts/Clustering_UMAP.R")).set { seurat_script_ch }
     Channel.value(file("scripts/Plots_Clusters.R")).set { seurat_script2_ch }
     Channel.value(file("scripts/Selected_Genes.R")).set { seurat_script3_ch }
@@ -181,7 +185,9 @@ workflow {
         transcriptome_ch,
         probe_set_ch,
         fastq_dir_ch,
-        image_file_ch
+        image_file_ch,
+        slide_sp_ch,
+        area_sp_ch
     )
     
     clustering_results = Clustering_analysis(
