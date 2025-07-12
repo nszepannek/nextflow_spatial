@@ -33,9 +33,13 @@ dev.off()
 
 # Distinguish location of top 6 clusters (takes a few seconds)
 jpeg("./plots/spatial_dim_top_6_cluster.jpeg", width = 2000, height = 1000, res = 200)
-spatial_dim_top_6_cluster <- SpatialDimPlot(seurat_obj, cells.highlight = CellsByIdentities(object = seurat_obj, idents = c(0, 1, 2, 3,
-                                                                                                                           4, 5)), facet.highlight = TRUE, ncol = 3) +
-  ggtitle("Location of top 6 clusters")
+spatial_dim_top_6_cluster <- SpatialDimPlot(
+  seurat_obj,
+  cells.highlight = CellsByIdentities(seurat_obj, idents = 0:5),
+  facet.highlight = TRUE,
+  ncol = 3,
+  label = TRUE
+)
 print(spatial_dim_top_6_cluster)
 dev.off()
 
@@ -66,7 +70,12 @@ top.features <- head(svf$gene, 6)
 
 # Visualisation
 jpeg("./plots/Spatial_variable_features_top6.jpeg", width = 2000, height = 1000, res = 200)
-Spatial_variable_features_top6 <- SpatialFeaturePlot(seurat_obj, features = top.features, ncol = 3, alpha = c(0.1, 1))+
+Spatial_variable_features_top6 <- SpatialFeaturePlot(
+  seurat_obj, 
+  features = top.features, 
+  ncol = 3, 
+  alpha = c(0.1, 1)
+) + 
   ggtitle("Location of top 6 variable features")
 print(Spatial_variable_features_top6)
 dev.off()
