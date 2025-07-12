@@ -102,13 +102,17 @@ process Plotting_Clusters {
     path r_script
 
     output:
-    path "${params.outdir}/plots/${sample_id}"
+    path "${params.outdir}/plots_clusters/${sample_id}"
 
     script:
     """
-    mkdir -p ${params.outdir}/plots/${sample_id}
+    mkdir -p ${params.outdir}/plots_clusters/${sample_id}
+    mkdir -p ${params.outdir}/csv/${sample_id}
+
     Rscript ${r_script} ${seurat_dir2}
-    cp -r plots/* ${params.outdir}/plots/${sample_id}/
+
+    cp -r csv/* ${params.outdir}/csv/${sample_id}/
+    cp -r plots_clusters/* ${params.outdir}/plots_clusters/${sample_id}/
     """
 }
 
@@ -148,7 +152,6 @@ process Annotate_Data {
 
     script:
     """
-    mkdir -p ${params.outdir}/csv/${sample_id}
     mkdir -p ${params.outdir}/plots_annotation/${sample_id}
 
     Rscript ${r_script} ${seurat_file} ${reference_file}

@@ -14,32 +14,26 @@ seurat_path <- args[1]
 seurat_obj <- readRDS(seurat_path)
 
 # Create directories for results (plots and csv)
-dir.create("plots", showWarnings = FALSE)
+dir.create("plots_clusters", showWarnings = FALSE)
 dir.create("csv", showWarnings = FALSE)
 
 # DimPlot: clustering in UMAP space
-jpeg("./plots/dim_plot_by_umap.jpeg", width = 2000, height = 1000, res = 200)
+jpeg("./plots_clusters/dim_plot_by_umap.jpeg", width = 2000, height = 1000, res = 200)
 dim_plot_by_umap <- DimPlot(seurat_obj, reduction = "umap", label = FALSE) +
   ggtitle("DimPlot of clusters")
 print(dim_plot_by_umap)
 dev.off()
 
 # SpatialDimPlot: Clustering overlaid on the image (label!)
-jpeg("./plots/spatialdim_by_umap.jpeg", width = 2000, height = 1000, res = 200)
+jpeg("./plots_clusters/spatialdim_by_umap.jpeg", width = 2000, height = 1000, res = 200)
 spatialdim_by_umap <- SpatialDimPlot(seurat_obj, label = TRUE, label.size = 3)+
   ggtitle("Location of clusters")
 print(spatialdim_by_umap)
 dev.off()
 
 # Distinguish location of top 6 clusters (takes a few seconds)
-jpeg("./plots/spatial_dim_top_6_cluster.jpeg", width = 2000, height = 1000, res = 200)
-spatial_dim_top_6_cluster <- SpatialDimPlot(
-  seurat_obj,
-  cells.highlight = CellsByIdentities(seurat_obj, idents = 0:5),
-  facet.highlight = TRUE,
-  ncol = 3,
-  label = TRUE
-)
+jpeg("./plots_clusters/spatial_dim_top_6_cluster.jpeg", width = 2000, height = 1000, res = 200)
+spatial_dim_top_6_cluster <- SpatialDimPlot(seurat_obj, cells.highlight = CellsByIdentities(object = seurat_obj, idents = c(0, 1, 2, 3, 4, 5)), facet.highlight = TRUE, ncol = 3)
 print(spatial_dim_top_6_cluster)
 dev.off()
 
@@ -69,14 +63,8 @@ svf <- svf[order(svf$moransi.spatially.variable.rank), ]
 top.features <- head(svf$gene, 6)
 
 # Visualisation
-jpeg("./plots/Spatial_variable_features_top6.jpeg", width = 2000, height = 1000, res = 200)
-Spatial_variable_features_top6 <- SpatialFeaturePlot(
-  seurat_obj, 
-  features = top.features, 
-  ncol = 3, 
-  alpha = c(0.1, 1)
-) + 
-  ggtitle("Location of top 6 variable features")
+jpeg("./plots_clusters/Spatial_variable_features_top6.jpeg", width = 2000, height = 1000, res = 200)
+Spatial_variable_features_top6 <- SpatialFeaturePlot(seurat_obj, features = top.features, ncol = 3, alpha = c(0.1, 1))
 print(Spatial_variable_features_top6)
 dev.off()
 
@@ -84,21 +72,21 @@ dev.off()
 for (gene in top.features) {
   
   # VlnPlot
-  jpeg(paste0("./plots/VlnPlot_", gene, ".jpeg"), width = 1000, height = 1000, res = 200)
+  jpeg(paste0("./plots_clusters/VlnPlot_", gene, ".jpeg"), width = 1000, height = 1000, res = 200)
   p1 <- VlnPlot(seurat_obj, features = gene) +
     ggtitle(paste("VlnPlot –", gene))
   print(p1)
   dev.off()
   
   # RidgePlot
-  jpeg(paste0("./plots/RidgePlot_", gene, ".jpeg"), width = 1000, height = 1000, res = 200)
+  jpeg(paste0("./plots_clusters/RidgePlot_", gene, ".jpeg"), width = 1000, height = 1000, res = 200)
   p2 <- RidgePlot(seurat_obj, features = gene) +
     ggtitle(paste("RidgePlot –", gene))
   print(p2)
   dev.off()
   
   # FeaturePlot
-  jpeg(paste0("./plots/FeaturePlot_", gene, ".jpeg"), width = 1000, height = 1000, res = 200)
+  jpeg(paste0("./plots_clusters/FeaturePlot_", gene, ".jpeg"), width = 1000, height = 1000, res = 200)
   p3 <- FeaturePlot(seurat_obj, features = gene) +
     ggtitle(paste("FeaturePlot –", gene))
   print(p3)
@@ -109,7 +97,7 @@ seurat_obj <- FindVariableFeatures(seurat_obj, selection.method = "vst", nfeatur
 
 top_50genes <- head(VariableFeatures(seurat_obj), 50)
 
-jpeg("./plots/DoHeatmap.jpeg", width = 1500, height = 1000, res = 200)
+jpeg("./plots_clusters/DoHeatmap.jpeg", width = 1500, height = 1000, res = 200)
 print(
   DoHeatmap(seurat_obj, features = top_50genes, size = 4, angle = 90) + NoLegend()
 )
@@ -144,7 +132,7 @@ for (cluster in cluster_ids) {
     theme_classic(base_size = 14)
   
   # Save plots
-  plot_filename <- paste0("./plots/volcano_cluster_", cluster, ".jpg")
+  plot_filename <- paste0("./plots_clusters/volcano_cluster_", cluster, ".jpg")
   ggsave(plot_filename, plot = p, width = 8, height = 6, dpi = 300)
   
   csv_filename <- paste0("./csv/DEG_cluster_", cluster, ".csv")
